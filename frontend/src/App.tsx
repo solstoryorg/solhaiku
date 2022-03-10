@@ -1,4 +1,6 @@
 import { WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base';
+import Container from '@mui/material/Container';
+import Box from '@mui/material/Box';
 import { WalletDialogProvider, WalletMultiButton } from '@solana/wallet-adapter-material-ui';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import {
@@ -14,6 +16,7 @@ import { clusterApiUrl } from '@solana/web3.js';
 import { useSnackbar } from 'notistack';
 import React, { FC, ReactNode, useCallback, useMemo } from 'react';
 import { Theme } from './Theme';
+import { NFTList } from './NFTList';
 
 export const App: FC = () => {
     return (
@@ -24,6 +27,8 @@ export const App: FC = () => {
         </Theme>
     );
 };
+
+const RPC_ENDPOINT_URL = "http://localhost:8899";
 
 const Context: FC<{ children: ReactNode }> = ({ children }) => {
     // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
@@ -67,5 +72,9 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 const Content: FC = () => {
-    return <WalletMultiButton />;
+    return (<Container sx={{display: "flex", flexDirection: "column", justifyContent: 'flex-center'}}>
+            <Box sx={{display: "flex", alignContent: "center", justifyContent:"center"}}><WalletMultiButton sx={{ margin: 5, justify: 'center', flexGrow: 0}}/></Box>
+            <NFTList />
+            </Container>
+    );
 };

@@ -1,6 +1,6 @@
-.parcel-cache
-dist
-docs
+# npm
 node_modules
 yarn.lock
 *.log
+*.gz
+
