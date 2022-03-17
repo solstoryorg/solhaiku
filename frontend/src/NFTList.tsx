@@ -20,8 +20,6 @@ import {
 import { Provider } from '@project-serum/anchor';
 
 //hackathon bullshit because of es6 commonjs stuff
-import  solstory  from '@solstory/api';
-const { SolstoryAPI } = solstory;
 
 import { useSnackbar } from 'notistack';
 
@@ -37,6 +35,7 @@ export function NFTList() {
     const getNFTs = function(ownerAddress:PublicKey|null){
         if (connection == undefined||ownerAddress == undefined)
               return;
+        console.log("conection", connection);
         connection.getParsedTokenAccountsByOwner(ownerAddress, {programId: TOKEN_PROGRAM_KEY})
                 .then((resp_and_ctx:any) => {
                     console.log("token get ctx", resp_and_ctx.context);
