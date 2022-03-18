@@ -1,5 +1,6 @@
 import { WalletAdapterNetwork, WalletError } from '@solana/wallet-adapter-base';
 import Container from '@mui/material/Container';
+import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import { WalletDialogProvider, WalletMultiButton } from '@solana/wallet-adapter-material-ui';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
@@ -75,6 +76,8 @@ const Context: FC<{ children: ReactNode }> = ({ children }) => {
 const Content: FC = () => {
     return (<Container sx={{display: "flex", flexDirection: "column", justifyContent: 'flex-center'}}>
             <Box sx={{display: "flex", alignContent: "center", justifyContent:"center"}}><WalletMultiButton sx={{ margin: 5, justify: 'center', flexGrow: 0}}/></Box>
+            <Box sx={{display: "flex", alignContent: "center", justifyContent:"center", marginBottom:5}}>
+            <Typography>Select an NFT, and send a haiku! First haiku takes longer (full confirmation on account setup before send).</Typography></Box>
             <NFTList />
             </Container>
     );

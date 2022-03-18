@@ -3,4 +3,5 @@ node_modules
 yarn.lock
 *.log
 *.gz
+dist
 

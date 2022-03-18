@@ -6,12 +6,15 @@ import Typography from '@mui/material/Typography';
 import { Metadata } from "@metaplex-foundation/mpl-token-metadata";
 import {utils} from '@metaplex/js';
 import { PublicKey, SystemProgram, Connection, Transaction, TransactionInstruction } from "@solana/web3.js";
+import axios from 'axios';
 
 const HAIKU_ADDRESS = "HAikuupsQpJViwtxtz2sGrgQ2hw18RYZ2pYQjLkNDcPw"
 const MEMO_PROGRAM = "MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr";
 import { useWallet, useAnchorWallet, useConnection } from '@solana/wallet-adapter-react';
 
 import React, { useState, useEffect } from 'react';
+
+const SERVER_URL = "http://localhost:3000"
 /*
  * This one sets up NFT display, which includes the popup
  * NFTPopup displaying all the attached programs.
@@ -42,7 +45,6 @@ export function NFTItem(props: {nft: any}) {
 
   const requestHaiku = async (event:any) => {
       console.log(event);
-    setDisplayState('sending');
 
       if(publicKey == undefined) {
           throw "cannot request haiku after disconnecting wallet"
@@ -65,9 +67,16 @@ export function NFTItem(props: {nft: any}) {
         )
 
         const signature = await sendTransaction(transaction, connection);
+        setDisplayState('sending');
 
         console.log(signature);
-        await connection.confirmTransaction(signature, 'processed');
+        setDisplayState('sending');
+        await connection.confirmTransaction(signature, 'finalized');
+
+        axios.get(SERVER_URL+'/haiku/'+signature).then((resp)=>{
+          console.log('res', resp);
+          setDisplayState('success');
+        });
 
         setDisplayState('sent');
   }
@@ -82,6 +91,8 @@ export function NFTItem(props: {nft: any}) {
             return (<Typography>sending</Typography>);
         case 'sent':
             return (<Typography>sent</Typography>);
+        case 'success':
+            return (<Typography>success!</Typography>);
         case 'error':
             return (<Typography>error sending</Typography>);
         default:
