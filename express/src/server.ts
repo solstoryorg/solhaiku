@@ -39,7 +39,7 @@ app.use(cookieParser());
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
     ENDPOINT = 'http://localhost:8899'
-    // ENDPOINT = 'https://api.devnet.solana.com';
+    ENDPOINT = 'https://api.devnet.solana.com';
     BUNDLR_ENDPOINT = 'devnet';
 
 }
@@ -47,8 +47,8 @@ if (process.env.NODE_ENV === 'development') {
 // Security (helmet recommended in express docs)
 if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
-    ENDPOINT = 'https://solana-api.projectserum.com'
-    BUNDLR_ENDPOINT = 'mainnet';
+    ENDPOINT = 'http://api.google.devnet.solana.com'
+    BUNDLR_ENDPOINT = 'devnet';
 }
 
 const connection = new Connection(ENDPOINT);
@@ -111,6 +111,7 @@ router.get('/init',  async (req: Request, res: Response, next:NextFunction):Prom
         url: "https://solhaiku.is",
         metadata: JSON.stringify({}),
         hasExtendedMetadata:false,
+        systemValidated: false,
         logo: "",
         baseUrl:"",
         apiVersion: 1,

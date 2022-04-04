@@ -14,7 +14,7 @@ import { useWallet, useAnchorWallet, useConnection } from '@solana/wallet-adapte
 
 import React, { useState, useEffect } from 'react';
 
-const SERVER_URL = "http://localhost:3000"
+const SERVER_URL = "https://solhaiku.is:8081"
 /*
  * This one sets up NFT display, which includes the popup
  * NFTPopup displaying all the attached programs.
@@ -23,6 +23,7 @@ export function NFTItem(props: {nft: any}) {
   const [metadata, setMetadata] = useState(undefined);
   const [extendedMetadata, setExtendedMetadata] = useState(undefined);
   const [displayState, setDisplayState] = useState('init');
+  const [signature, setSignature] = useState('');
 
   const { publicKey, sendTransaction } = useWallet();
   const { connection } = useConnection();
@@ -66,20 +67,39 @@ export function NFTItem(props: {nft: any}) {
           })
         )
 
-        const signature = await sendTransaction(transaction, connection);
+        const localSignature = await sendTransaction(transaction, connection);
         setDisplayState('sending');
 
-        console.log(signature);
+        console.log(localSignature);
+        setSignature(localSignature);
         setDisplayState('sending');
-        await connection.confirmTransaction(signature, 'finalized');
+        try {
+          await connection.confirmTransaction(localSignature, 'finalized')
+        }catch(err) {
+          setDisplayState("error getting confirmation");
+        }
 
-        axios.get(SERVER_URL+'/haiku/'+signature).then((resp)=>{
+
+        axios.get(SERVER_URL+'/haiku/'+localSignature).then((resp)=>{
           console.log('res', resp);
           setDisplayState('success');
+        }).catch((err)=> {
+          setDisplayState("server confirmation unsuccessful - you might need to try again if devnet is slow");
         });
-
         setDisplayState('sent');
   }
+
+  const sendSignature = (e:any) => {
+      e.stopPropagation()
+      axios.get(SERVER_URL+'/haiku/'+signature).then((resp)=>{
+        console.log('res', resp);
+        setDisplayState('success');
+      }).catch((err)=> {
+        setDisplayState("server confirmation unsuccessful - you might need to try again if devnet is slow");
+      });
+      setDisplayState('sent');
+  };
+
 
   const displayDialogue = () => {
     switch (displayState) {
@@ -93,11 +113,10 @@ export function NFTItem(props: {nft: any}) {
             return (<Typography>sent</Typography>);
         case 'success':
             return (<Typography>success!</Typography>);
-        case 'error':
-            return (<Typography>error sending</Typography>);
         default:
-            console.error("error in displayState switch");
-            return (<Typography>error</Typography>);
+            console.error("Error sending.");
+        return (<Grid container> <Grid item><Typography>Error: {displayState}</Typography></Grid>
+                <Grid item><Button onClick={sendSignature}>Server Confirm</Button></Grid></Grid>);
     }
   }
 
