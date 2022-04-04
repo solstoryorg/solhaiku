@@ -29,7 +29,7 @@ export const App: FC = () => {
     );
 };
 
-const RPC_ENDPOINT_URL = "http://localhost:8899";
+const RPC_ENDPOINT_URL = "https://api.devnet.solana.com";
 
 const Context: FC<{ children: ReactNode }> = ({ children }) => {
     // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.

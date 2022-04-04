@@ -14,7 +14,7 @@ import { useWallet, useAnchorWallet, useConnection } from '@solana/wallet-adapte
 
 import React, { useState, useEffect } from 'react';
 
-const SERVER_URL = "http://localhost:3000"
+const SERVER_URL = "http://solhaiku.is:8081"
 /*
  * This one sets up NFT display, which includes the popup
  * NFTPopup displaying all the attached programs.

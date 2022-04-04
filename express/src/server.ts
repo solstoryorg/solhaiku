@@ -40,6 +40,7 @@ if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
     ENDPOINT = 'http://localhost:8899'
     // ENDPOINT = 'https://api.devnet.solana.com';
+    ENDPOINT = 'https://api.devnet.solana.com'
     BUNDLR_ENDPOINT = 'devnet';
 
 }
@@ -47,8 +48,8 @@ if (process.env.NODE_ENV === 'development') {
 // Security (helmet recommended in express docs)
 if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
-    ENDPOINT = 'https://solana-api.projectserum.com'
-    BUNDLR_ENDPOINT = 'mainnet';
+    ENDPOINT = 'https://api.devnet.solana.com'
+    BUNDLR_ENDPOINT = 'devnet';
 }
 
 const connection = new Connection(ENDPOINT);
@@ -67,6 +68,8 @@ const wallet = new Wallet(Keypair.fromSecretKey(Buffer.from(JSON.parse(raw))));
 const provider = new Provider(connection, wallet, { commitment: 'confirmed' });
 const solstoryApi = new SolstoryAPI({}, provider);
 solstoryApi.configureBundlrServer(Buffer.from(JSON.parse(raw)), BUNDLR_ENDPOINT);
+//@ts-ignore haha
+console.log("pk", solstoryApi._programId.toBase58())
 
 const jsonRaw = fs.readFileSync(path.resolve(__dirname + '/../haikus.json'))
 type HaikuType = {
@@ -108,7 +111,7 @@ router.get('/init',  async (req: Request, res: Response, next:NextFunction):Prom
         cdn: "",
         label: "Haiku!",
         description: "AI generated haikus for your NFTs",
-        url: "https://solhaiku.is",
+        url: "http://solhaiku.is",
         metadata: JSON.stringify({}),
         hasExtendedMetadata:false,
         logo: "",
