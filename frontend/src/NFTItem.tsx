@@ -14,7 +14,8 @@ import { useWallet, useAnchorWallet, useConnection } from '@solana/wallet-adapte
 
 import React, { useState, useEffect } from 'react';
 
-const SERVER_URL = "https://solhaiku.is:8081"
+// const SERVER_URL = "https://solhaiku.is:8081"
+const SERVER_URL = "http://localhost:3000";
 /*
  * This one sets up NFT display, which includes the popup
  * NFTPopup displaying all the attached programs.
@@ -73,12 +74,6 @@ export function NFTItem(props: {nft: any}) {
         console.log(localSignature);
         setSignature(localSignature);
         setDisplayState('sending');
-        try {
-          await connection.confirmTransaction(localSignature, 'finalized')
-        }catch(err) {
-          setDisplayState("error getting confirmation");
-        }
-
 
         axios.get(SERVER_URL+'/haiku/'+localSignature).then((resp)=>{
           console.log('res', resp);
@@ -108,9 +103,9 @@ export function NFTItem(props: {nft: any}) {
         case 'confirmation':
             return (<Button onClick={requestHaiku}>send haiku</Button>);
         case 'sending':
-            return (<Typography>sending</Typography>);
+            return (<Typography>sending transaction via solana</Typography>);
         case 'sent':
-            return (<Typography>sent</Typography>);
+            return (<Typography>server awaiting confirmation</Typography>);
         case 'success':
             return (<Typography>success!</Typography>);
         default:

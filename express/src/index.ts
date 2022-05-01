@@ -9,19 +9,32 @@ import fs from 'fs';
 const serverStartMsg = 'Express server started on port: ',
         port = (process.env.PORT || 3000);
 
-const privateKey = fs.readFileSync('/etc/letsencrypt/live/solhaiku.is/privkey.pem', 'utf8');
-const certificate = fs.readFileSync('/etc/letsencrypt/live/solhaiku.is/cert.pem', 'utf8');
-const chain = fs.readFileSync('/etc/letsencrypt/live/solhaiku.is/chain.pem', 'utf8');
+if (process.env.NODE_ENV === 'development') {
 
-const serverOptions = {
-  key: privateKey,
-  cert: certificate,
-  ca: [chain]
-};
+  // Constants
+  const serverStartMsg = 'Express server started on port: ',
+          port = (process.env.PORT || 3000);
+
+  // Start server
+  server.listen(port, () => {
+      logger.info(serverStartMsg + port);
+  });
+
+}else{
+  const privateKey = fs.readFileSync('/etc/letsencrypt/live/solhaiku.is/privkey.pem', 'utf8');
+  const certificate = fs.readFileSync('/etc/letsencrypt/live/solhaiku.is/cert.pem', 'utf8');
+  const chain = fs.readFileSync('/etc/letsencrypt/live/solhaiku.is/chain.pem', 'utf8');
+
+  const serverOptions = {
+    key: privateKey,
+    cert: certificate,
+    ca: [chain]
+  };
 
 
-const httpsServ = https.createServer(serverOptions, server);
-// Start server
-httpsServ.listen(port, () => {
-    logger.info(serverStartMsg + port);
-});
+  const httpsServ = https.createServer(serverOptions, server);
+  // Start server
+  httpsServ.listen(port, () => {
+      logger.info(serverStartMsg + port);
+  });
+}

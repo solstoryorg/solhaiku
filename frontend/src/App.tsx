@@ -29,8 +29,8 @@ export const App: FC = () => {
     );
 };
 
-// const RPC_ENDPOINT_URL = "http://localhost:8899";
-const RPC_ENDPOINT_URL = "https://api.devnet.solana.com";
+const RPC_ENDPOINT_URL = "http://localhost:8899";
+// const RPC_ENDPOINT_URL = "https://api.devnet.solana.com";
 
 const Context: FC<{ children: ReactNode }> = ({ children }) => {
     // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
@@ -78,7 +78,7 @@ const Content: FC = () => {
     return (<Container sx={{display: "flex", flexDirection: "column", justifyContent: 'flex-center'}}>
             <Box sx={{display: "flex", alignContent: "center", justifyContent:"center"}}><WalletMultiButton sx={{ margin: 5, justify: 'center', flexGrow: 0}}/></Box>
             <Box sx={{display: "flex", alignContent: "center", justifyContent:"center", marginBottom:5}}>
-            <Typography>Select an NFT, and send a haiku! First haiku takes longer (full confirmation on account setup before send).</Typography></Box>
+            <Typography>Select an NFT, and send a haiku!</Typography></Box>
             <NFTList />
             </Container>
     );

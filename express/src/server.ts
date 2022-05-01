@@ -38,8 +38,8 @@ app.use(cookieParser());
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
-    // ENDPOINT = 'http://localhost:8899'
-    ENDPOINT = 'https://api.devnet.solana.com';
+    ENDPOINT = 'http://localhost:8899'
+    // ENDPOINT = 'https://api.devnet.solana.com';
     BUNDLR_ENDPOINT = 'devnet';
 
 }
@@ -51,7 +51,6 @@ if (process.env.NODE_ENV === 'production') {
     BUNDLR_ENDPOINT = 'devnet';
 }
 
-const connection = new Connection(ENDPOINT);
 
 
 /***********************************************************************************
@@ -59,16 +58,17 @@ const connection = new Connection(ENDPOINT);
  **********************************************************************************/
 
 
-console.log(ANCHOR_WALLET);
+console.log("Using wallet: ", ANCHOR_WALLET);
 
-//we initialize this the same we would an anchor api
+// Same code you'd use to initialize anchor.
+const connection = new Connection(ENDPOINT);
 const raw = fs.readFileSync(path.resolve(ANCHOR_WALLET), 'utf8');
 const wallet = new Wallet(Keypair.fromSecretKey(Buffer.from(JSON.parse(raw))));
 const provider = new Provider(connection, wallet, { commitment: 'confirmed' });
+
 const solstoryApi = new SolstoryAPI({}, provider);
+// Just one extra step to configure automatic data uploading
 solstoryApi.configureBundlrServer(Buffer.from(JSON.parse(raw)), BUNDLR_ENDPOINT);
-//@ts-ignore haha
-console.log("pk", solstoryApi._programId.toBase58())
 
 const jsonRaw = fs.readFileSync(path.resolve(__dirname + '/../haikus.json'))
 type HaikuType = {
@@ -86,24 +86,16 @@ const router = Router()
 const { CREATED, OK } = StatusCodes;
 const transCache = new NodeCache({stdTTL: 60*60})
 
+/*
+ * This function is just an easy way for us to handle one time setup for solstory. It would
+ * be totally reasonable to do this as a yarn script. Actually it would make a lot
+ * more sense as a yarn script. But I was feeling lazy the morning I wrote this.
+ */
 router.get('/init',  async (req: Request, res: Response, next:NextFunction):Promise<string> => {
     const [solstoryPda, _nonce2] = await PublicKey.findProgramAddress(
       [Buffer.from((new TextEncoder()).encode("solstory_pda"))],
       solstoryApi.programId
     );
-
-    try {
-    await solstoryApi.rpc.initialize({
-        accounts:{
-          solstoryPda: solstoryPda,
-          authority: wallet.publicKey,
-          systemProgram: "11111111111111111111111111111111"
-        },
-        signers:[wallet.payer]
-    });
-    }catch(e){
-        console.log("already initted");
-    }
 
     return solstoryApi.server.writer.createWriterMetadata({
         writerKey: wallet.payer.publicKey,
@@ -122,15 +114,6 @@ router.get('/init',  async (req: Request, res: Response, next:NextFunction):Prom
 
 });
 
-/*
- * getMin
- * getOwner
- * findProgramAddress("haikupls", owner_id)
- * verify it exists
- * check if head exists create
- * createHeadIfNotExist
- * bundlr upload
- */
 router.get('/haiku/:txid', (req: Request, res: Response, next:NextFunction) => {
     const { txid } = req.params;
 
@@ -141,7 +124,12 @@ router.get('/haiku/:txid', (req: Request, res: Response, next:NextFunction) => {
         throw Error("Transaction already processed.");
     }
 
-    connection.getParsedTransaction((txid )).then(async (tx) => {
+    console.log("Attempting to confirm ", txid);
+    connection.confirmTransaction(txid).then((res) => {
+        console.log("confirmed transaction: ", res)
+        // get the transaction
+        return connection.getParsedTransaction((txid ))
+    }).then(async (tx) => {
         if(tx==null)
             throw Error("Transaction not found")
 
@@ -162,7 +150,6 @@ router.get('/haiku/:txid', (req: Request, res: Response, next:NextFunction) => {
         if (transferIx.program != 'system' ||
             transferIx.parsed.info.destination != wallet.payer.publicKey.toBase58() ||
                 transferIx.parsed.type != 'transfer'){
-            console.log(transferIx.parsed.destination, wallet.payer.publicKey);
             throw Error("Invalid transaction")
         }
 
@@ -202,7 +189,7 @@ router.get('/haiku/:txid', (req: Request, res: Response, next:NextFunction) => {
                 haiku:haiku,
             }
         }
-        const out = await solstoryApi.server.writer.appendItem(new PublicKey(nftId), item);
+        const out = await solstoryApi.server.writer.appendItemCreate(new PublicKey(nftId), item);
 
 
 
