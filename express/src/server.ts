@@ -97,7 +97,7 @@ router.get('/init',  async (req: Request, res: Response, next:NextFunction):Prom
       solstoryApi.programId
     );
 
-    return solstoryApi.server.writer.createWriterMetadata({
+    return solstoryApi.writer.createWriterMetadata({
         writerKey: wallet.payer.publicKey,
         cdn: "",
         label: "Haiku!",
@@ -189,7 +189,7 @@ router.get('/haiku/:txid', (req: Request, res: Response, next:NextFunction) => {
                 haiku:haiku,
             }
         }
-        const out = await solstoryApi.server.writer.appendItemCreate(new PublicKey(nftId), item);
+        const out = await solstoryApi.writer.appendItemCreate(new PublicKey(nftId), item);
 
 
 
